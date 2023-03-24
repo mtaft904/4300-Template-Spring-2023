@@ -100,6 +100,7 @@
     border: 1px solid black;
     margin: auto;
     margin-top: 10px;
+    cursor: pointer;
 }
 
 .likes {
@@ -107,6 +108,7 @@
     width: 600px;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
 }
 
 .submit {

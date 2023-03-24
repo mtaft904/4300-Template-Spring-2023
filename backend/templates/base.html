@@ -17,7 +17,7 @@
             </div>
             <div class="input-box" onclick="sendFocus()">
                 <img src="{{ url_for('static', filename='images/mag.png') }}" />
-                <input placeholder="Search for a cocktail" id="filter-text-val" onkeyup="filterText()">
+                <input placeholder="Search for an ingredient" id="filter-text-val" onkeyup="filterText()">
             </div>
             <div>
                 <button type="submit" id="submitButton" class="ingredient submit"
@@ -46,10 +46,12 @@
         }
 
         function appendIngredient(ingredient) {
-            let tempDiv = document.createElement("div")
-            tempDiv.innerHTML = userLikesTemplate(ingredient)
-            document.getElementById("user_likes").appendChild(tempDiv)
-            likes.push(ingredient)
+            if (!likes.includes(ingredient)) {
+                let tempDiv = document.createElement("div")
+                tempDiv.innerHTML = userLikesTemplate(ingredient)
+                document.getElementById("user_likes").appendChild(tempDiv)
+                likes.push(ingredient)
+            }
         }
 
         function userLikesTemplate(ingredient) {
