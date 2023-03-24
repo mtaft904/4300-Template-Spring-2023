@@ -90,7 +90,7 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-.ing-button {
+.ingredient {
     text-align: center;
     background-color: inherit;
     font-size: medium;
@@ -104,4 +104,17 @@
 
 .likes {
     display: flex;
+    width: 600px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.submit {
+    padding: 15px;
+    background-color: orange;
+    border: none
+}
+
+.submit:hover {
+    background-color: darkorange;
 }

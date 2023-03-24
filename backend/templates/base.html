@@ -12,19 +12,20 @@
             <div class="google-colors">
                 <h1>DrinkGPT</h1>
             </div>
+            <h1>Choose some ingredients you like:</h1>
+            <div class="likes" id="user_likes">
+            </div>
             <div class="input-box" onclick="sendFocus()">
                 <img src="{{ url_for('static', filename='images/mag.png') }}" />
                 <input placeholder="Search for a cocktail" id="filter-text-val" onkeyup="filterText()">
             </div>
             <div>
-                <button type="submit" id="submitButton" onclick="sendUserLikes()">submit</button>
+                <button type="submit" id="submitButton" class="ingredient submit"
+                    onclick="sendUserLikes()">submit</button>
             </div>
         </div>
         <div id="answer-box">
 
-        </div>
-        <div id="user_likes">
-            <h1>Ingredients to Include:</h1>
         </div>
     </div>
 
@@ -41,7 +42,7 @@
         }
 
         function answerBoxButton(ingredient) {
-            return `<button class="ing-button" type="button">${ingredient}</button>`
+            return `<button class="ingredient" type="button">${ingredient}</button>`
         }
 
         function appendIngredient(ingredient) {
@@ -52,9 +53,7 @@
         }
 
         function userLikesTemplate(ingredient) {
-            return `<div class="likes">
-                <p class='episode-desc'>${ingredient}</p>
-                </div>`
+            return `<p class='episode-desc ingredient'>${ingredient}</p>`
         }
 
         function sendFocus() {
