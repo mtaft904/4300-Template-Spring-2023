@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS drinkdb;
+CREATE DATABASE IF NOT EXISTS kardashiandb;
 
-USE drinkdb;
+USE kardashiandb;
 
 DROP TABLE IF EXISTS drinks;
 CREATE TABLE drinks(
