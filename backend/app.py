@@ -25,6 +25,7 @@ mysql_engine.load_file_into_db()
 app = Flask(__name__)
 CORS(app)
 
+likes = []
 # Sample search, the LIKE operator in this case is hard-coded,
 # but if you decide to use SQLAlchemy ORM framework,
 # there's a much better and cleaner way to do this
@@ -44,10 +45,13 @@ def sql_search(query):
     # data = mysql_engine.query_selector(sql_descriptions)
     # return json.dumps([dict(zip(keys, i)) for i in data])
 
-    query_sql = f"""SELECT * FROM drinks WHERE drink_id IN (SELECT drink_id FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%') limit 10"""
+    #query_sql = f"""SELECT * FROM drinks WHERE drink_id IN (SELECT drink_id FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%') limit 10"""
+    query_sql = f"""SELECT DISTINCT ingredient FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%' limit 10"""
+    keys = ["ingredient"]
     data = mysql_engine.query_selector(query_sql)
-    keys = ["drink_id", "drink", "ingredients", "method"]
+    #keys = ["drink_id", "drink", "ingredients", "method"]
     return json.dumps([dict(zip(keys, i)) for i in data])
+    #return data
 
 
 @app.route("/")
@@ -59,5 +63,10 @@ def home():
 def episodes_search():
     text = request.args.get("title")
     return sql_search(text)
+
+@app.route("/likes", methods=["POST"])
+def add_like():
+    likes = request.args.get("likes")
+    return json.dumps(likes)
 
 # app.run(debug=True)
