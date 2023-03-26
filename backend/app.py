@@ -69,4 +69,9 @@ def add_like():
     likes = request.args.get("likes")
     return json.dumps(likes)
 
+@app.route("/dislikes", methods=["POST"])
+def add_dislike():
+    dislikes = request.args.get("dislikes")
+    return json.dumps(dislikes)
+
 # app.run(debug=True)
