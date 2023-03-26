@@ -1,8 +1,11 @@
 import json
 import os
+import numpy as np
+import numpy.linalg as LA
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
+from unicodedata import normalize
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -12,7 +15,7 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 # Don't worry about the deployment credentials, those are fixed
 # You can use a different DB name if you want to
 MYSQL_USER = "root"
-MYSQL_USER_PASSWORD = "MayankRao16Cornell.edu"
+MYSQL_USER_PASSWORD = os.environ.get("SQL_PASS")
 MYSQL_PORT = 3306
 MYSQL_DATABASE = "kardashiandb"
 
@@ -46,13 +49,37 @@ def sql_search(query):
     # data = mysql_engine.query_selector(sql_descriptions)
     # return json.dumps([dict(zip(keys, i)) for i in data])
 
-    #query_sql = f"""SELECT * FROM drinks WHERE drink_id IN (SELECT drink_id FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%') limit 10"""
+    # query_sql = f"""SELECT * FROM drinks WHERE drink_id IN (SELECT drink_id FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%') limit 10"""
     query_sql = f"""SELECT DISTINCT ingredient FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%' limit 10"""
     keys = ["ingredient"]
     data = mysql_engine.query_selector(query_sql)
-    #keys = ["drink_id", "drink", "ingredients", "method"]
+    # keys = ["drink_id", "drink", "ingredients", "method"]
     return json.dumps([dict(zip(keys, i)) for i in data])
-    #return data
+    # return data
+
+
+def normalize_ingredient(ingredient):
+    return normalize('NFC', ingredient.lower())
+
+
+def ingredient_name_index():
+    query_sql = f"""SELECT DISTINCT ingredient FROM ingredients"""
+    data = mysql_engine.query_selector(query_sql)
+    return {normalize_ingredient(ingredient[0]): i for i, ingredient in enumerate(data)}
+
+
+def drink_ingredient_matrix(ingredient_index):
+    query_sql = f"""SELECT * FROM ingredients"""
+    data = [row for row in mysql_engine.query_selector(query_sql)]
+
+    n_drinks = len(dict(data))
+    n_ingredients = len(ingredient_index)
+
+    result = np.zeros((n_drinks, n_ingredients))
+    for drink_id, ingredient in data:
+        result[drink_id,
+               ingredient_index[normalize_ingredient(ingredient)]] = 1
+    return result
 
 
 @app.route("/")
@@ -65,10 +92,40 @@ def episodes_search():
     text = request.args.get("title")
     return sql_search(text)
 
+
+def lookup_drink_by_id(id):
+    query_sql = f"""SELECT * FROM drinks WHERE drink_id = {id} LIMIT 1"""
+    data = mysql_engine.query_selector(query_sql)
+    for row in data:
+        return row
+
+
 @app.route("/likes", methods=["POST"])
 def add_like():
-    likes = request.args.get("likes")
-    return json.dumps(likes)
+    ingredient_index = ingredient_name_index()
+    d_i_matrix = drink_ingredient_matrix(ingredient_index)
+
+    likes = request.args.get("likes").split(',')
+    if not likes:
+        return json.dumps([])
+
+    query_vec = np.zeros(len(ingredient_index))
+    for ingredient in likes:
+        query_vec[ingredient_index[normalize_ingredient(ingredient)]] = 1
+
+    q_norm = LA.norm(query_vec)
+    doc_norms = LA.norm(d_i_matrix, axis=1)
+    sims = np.matmul(d_i_matrix, query_vec)
+    sims /= doc_norms
+    sims /= q_norm
+
+    top_10 = np.argsort(sims)[-10:][::-1]
+    keys = ["drink_id", "drink", "ingredients", "method"]
+    result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
+                        for i in top_10])
+    print(likes)
+    print(result)
+    return result
 
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
