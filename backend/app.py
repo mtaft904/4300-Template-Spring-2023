@@ -26,6 +26,7 @@ app = Flask(__name__)
 CORS(app)
 
 likes = []
+dislikes = []
 # Sample search, the LIKE operator in this case is hard-coded,
 # but if you decide to use SQLAlchemy ORM framework,
 # there's a much better and cleaner way to do this
