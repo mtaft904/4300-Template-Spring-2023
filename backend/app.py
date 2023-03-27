@@ -127,10 +127,12 @@ def cosine_sim_ranking_ids(query_vec):
 
 
 def rocchio_update(likes_vec, dislikes_vec, alpha=1.0, beta=0.8, gamma=0.1, trim=False):
-    relevant_drinks = d_i_matrix[np.where(
-        np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))]
-    irrelevant_drinks = d_i_matrix[np.where(
-        np.any(np.logical_and(dislikes_vec, d_i_matrix), axis=1))]
+    like_ids = np.where(
+        np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))[0]
+    dislike_ids = np.where(
+        np.any(np.logical_and(dislikes_vec, d_i_matrix), axis=1))[0]
+    relevant_drinks = d_i_matrix[[i for i in like_ids if i not in dislike_ids]]
+    irrelevant_drinks = d_i_matrix[dislike_ids]
     rel = LA.norm(relevant_drinks, axis=0)
     nrel = LA.norm(irrelevant_drinks, axis=0)
     result = alpha * likes_vec + beta * rel - gamma * nrel
