@@ -147,8 +147,8 @@ def add_like():
     keys = ["drink_id", "drink", "ingredients", "method"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
                         for i in top_10])
-    print(likes)
-    print(result)
+    # print(likes)
+    # print(result)
     return result
 
 
