@@ -17,7 +17,7 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 MYSQL_USER = "root"
 MYSQL_USER_PASSWORD = os.environ.get("SQL_PASS")
 MYSQL_PORT = 3306
-MYSQL_DATABASE = "kardashiandb"
+MYSQL_DATABASE = "drinkdb"
 
 mysql_engine = MySQLDatabaseHandler(
     MYSQL_USER, MYSQL_USER_PASSWORD, MYSQL_PORT, MYSQL_DATABASE)
@@ -50,7 +50,7 @@ def sql_search(query):
     # return json.dumps([dict(zip(keys, i)) for i in data])
 
     # query_sql = f"""SELECT * FROM drinks WHERE drink_id IN (SELECT drink_id FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%') limit 10"""
-    query_sql = f"""SELECT DISTINCT ingredient FROM ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%' limit 10"""
+    query_sql = f"""SELECT DISTINCT ingredient FROM drinkdb.ingredients WHERE LOWER( ingredient ) LIKE '%%{query.lower()}%%' limit 10"""
     keys = ["ingredient"]
     data = mysql_engine.query_selector(query_sql)
     # keys = ["drink_id", "drink", "ingredients", "method"]
@@ -63,13 +63,13 @@ def normalize_ingredient(ingredient):
 
 
 def ingredient_name_index():
-    query_sql = f"""SELECT DISTINCT ingredient FROM ingredients"""
+    query_sql = f"""SELECT DISTINCT ingredient FROM drinkdb.ingredients"""
     data = mysql_engine.query_selector(query_sql)
     return {normalize_ingredient(ingredient[0]): i for i, ingredient in enumerate(data)}
 
 
 def drink_ingredient_matrix(ingredient_index):
-    query_sql = f"""SELECT * FROM ingredients"""
+    query_sql = f"""SELECT * FROM drinkdb.ingredients"""
     data = [row for row in mysql_engine.query_selector(query_sql)]
 
     n_drinks = len(dict(data))
@@ -94,7 +94,7 @@ def episodes_search():
 
 
 def lookup_drink_by_id(id):
-    query_sql = f"""SELECT * FROM drinks WHERE drink_id = {id} LIMIT 1"""
+    query_sql = f"""SELECT * FROM drinkdb.drinks WHERE drink_id = {id} LIMIT 1"""
     data = mysql_engine.query_selector(query_sql)
     for row in data:
         return row
@@ -117,14 +117,17 @@ def cosine_sim_ranking_ids(query_vec, d_i_matrix):
     return np.argsort(sims)[::-1]
 
 
-def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1):
+def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1, trim=False):
     relevant_drinks = d_i_matrix[np.where(
         np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))]
     irrelevant_drinks = d_i_matrix[np.where(
         np.any(np.logical_and(dislikes_vec, d_i_matrix), axis=1))]
     rel = LA.norm(relevant_drinks, axis=0)
     nrel = LA.norm(irrelevant_drinks, axis=0)
-    return alpha * likes_vec + beta * rel + gamma * nrel
+    result = alpha * likes_vec + beta * rel + gamma * nrel
+    if trim:
+        result = np.maximum(result, 0.0)
+    return result
 
 
 @app.route("/likes", methods=["POST"])
