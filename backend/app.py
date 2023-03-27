@@ -129,9 +129,11 @@ def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gam
 
 @app.route("/likes", methods=["POST"])
 def add_like():
+
     ingredient_index = ingredient_name_index()
     d_i_matrix = drink_ingredient_matrix(ingredient_index)
 
+    global likes
     likes = [normalize_ingredient(i)
              for i in request.args.get("likes").split(',')]
     if not likes:
@@ -144,14 +146,34 @@ def add_like():
     keys = ["drink_id", "drink", "ingredients", "method"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
                         for i in top_10])
-    print(likes)
-    print(result)
     return result
 
 
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
-    dislikes = request.args.get("dislikes")
-    return json.dumps(dislikes)
+    ingredient_index = ingredient_name_index()
+    d_i_matrix = drink_ingredient_matrix(ingredient_index)
+
+    global dislikes
+    dislikes = [normalize_ingredient(i)
+             for i in request.args.get("dislikes").split(',')]
+    query_vec = vectorize_query(likes, ingredient_index)
+
+    if dislikes:
+            top_10 = cosine_sim_ranking_ids(query_vec, d_i_matrix)[:10]
+            keys = ["drink_id", "drink", "ingredients", "method"]
+            result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
+                        for i in top_10])
+            return result
+
+    dislikes_vec = vectorize_query(dislikes, ingredient_index)
+    query_vec = rocchio_update(query_vec, dislikes_vec, d_i_matrix,gamma=0)
+    top_10 = cosine_sim_ranking_ids(query_vec, d_i_matrix)[:10]
+
+    keys = ["drink_id", "drink", "ingredients", "method"]
+    result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
+                        for i in top_10])
+    
+    return result
 
 # app.run(debug=True)
