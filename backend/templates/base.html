@@ -25,6 +25,10 @@
             <div id="submitButton">
             </div>
         </div>
+        <div id="responseHeader">
+        </div>
+        <div id="responses">
+        </div>
         <div id="answer-box">
 
         </div>
@@ -91,15 +95,30 @@
         }
 
         function sendUserLikes() {
+            jsonResponse = []
+            console.log('test')
+            let i = 0
+            document.getElementById("responses").innerHTML = '<h2>Here are some drinks you might like!</h2>'
             fetch("/likes?" + new URLSearchParams({ likes: likes }).toString(), { method: "POST" })
-                .then((response) => response.json())
-                .then((data) => console.log(data)
-                );
-            document.getElementById("prompt").innerHTML = 'Now choose ingredients you dislike:';
-            document.getElementById("user_likes").innerHTML = ''
-            document.getElementById("nextButton").remove();
-            document.getElementById("submitButton").innerHTML = '<button type="submit" id="submitButton" class="ingredient submit" onclick = "sendUserDislikes()" > Submit</button >'
-            step2 = true;
+            .then((response) => response.json())
+            .then((data) => {data.forEach(drinkDict => {
+                let drink = data[i]['drink']
+                let ingredients = data[i]['ingredients']
+                let method = data[i]['method']
+                let tempDiv = document.createElement("div")
+                tempDiv.innerHTML = answerBoxTemplate(drink, ingredients, method)
+                document.getElementById("responses").appendChild(tempDiv)
+                i++
+                })})
+            // .then((response) => response.text())
+            // .then((text) => {
+            //     document.getElementById("responses").innerHTML = text;
+            // });
+            // document.getElementById("prompt").innerHTML = 'Now choose ingredients you dislike:';
+            // document.getElementById("user_likes").innerHTML = ''
+            // document.getElementById("nextButton").remove();
+            // document.getElementById("submitButton").innerHTML = '<button type="submit" id="submitButton" class="ingredient submit" onclick = "sendUserDislikes()" > Submit</button >'
+            // step2 = true;
         }
 
         function sendUserDislikes() {
@@ -108,6 +127,14 @@
                 .then((data) => console.log(data)
                 );
             document.getElementById("user_likes").innerHTML = ''
+        }
+
+        function sendResults() {
+            fetch("/dislikes?" + new URLSearchParams({ dislikes: dislikes }).toString(), { method: "POST" })
+                .then((response) => response.json())
+                .then((data) => console.log(data)
+                );
+            
         }
 
     </script>
