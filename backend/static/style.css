@@ -77,7 +77,7 @@
     outline: 0;
 }
 
-#answer-box {
+.answer-box {
     width: 700px;
     margin-top: 50px;
 }
