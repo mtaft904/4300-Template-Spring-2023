@@ -100,32 +100,54 @@ def lookup_drink_by_id(id):
         return row
 
 
-@app.route("/likes", methods=["POST"])
-def add_like():
-    ingredient_index = ingredient_name_index()
-    d_i_matrix = drink_ingredient_matrix(ingredient_index)
+def vectorize_query(query, ingredient_index):
+    result = np.zeros(len(ingredient_index))
+    for ingredient in query:
+        result[ingredient_index[ingredient]] = 1
+    return result
 
-    likes = request.args.get("likes").split(',')
-    if not likes:
-        return json.dumps([])
 
-    query_vec = np.zeros(len(ingredient_index))
-    for ingredient in likes:
-        query_vec[ingredient_index[normalize_ingredient(ingredient)]] = 1
-
+def cosine_sim_ranking_ids(query_vec, d_i_matrix):
     q_norm = LA.norm(query_vec)
     doc_norms = LA.norm(d_i_matrix, axis=1)
     sims = np.matmul(d_i_matrix, query_vec)
     sims /= doc_norms
     sims /= q_norm
 
-    top_10 = np.argsort(sims)[-10:][::-1]
+    return np.argsort(sims)[::-1]
+
+
+def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1):
+    relevant_drinks = d_i_matrix[np.where(
+        np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))]
+    irrelevant_drinks = d_i_matrix[np.where(
+        np.any(np.logical_and(dislikes_vec, d_i_matrix), axis=1))]
+    rel = LA.norm(relevant_drinks, axis=0)
+    nrel = LA.norm(irrelevant_drinks, axis=0)
+    return alpha * likes_vec + beta * rel + gamma * nrel
+
+
+@app.route("/likes", methods=["POST"])
+def add_like():
+    ingredient_index = ingredient_name_index()
+    d_i_matrix = drink_ingredient_matrix(ingredient_index)
+
+    likes = [normalize_ingredient(i)
+             for i in request.args.get("likes").split(',')]
+    if not likes:
+        return json.dumps([])
+
+    query_vec = vectorize_query(likes, ingredient_index)
+    # query_vec = rocchio_update(query_vec, np.zeros(query_vec.shape), d_i_matrix,gamma=0)
+    top_10 = cosine_sim_ranking_ids(query_vec, d_i_matrix)[:10]
+
     keys = ["drink_id", "drink", "ingredients", "method"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
                         for i in top_10])
     print(likes)
     print(result)
     return result
+
 
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
