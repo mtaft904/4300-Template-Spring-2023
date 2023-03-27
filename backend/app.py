@@ -117,14 +117,17 @@ def cosine_sim_ranking_ids(query_vec, d_i_matrix):
     return np.argsort(sims)[::-1]
 
 
-def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1):
+def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1, trim=False):
     relevant_drinks = d_i_matrix[np.where(
         np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))]
     irrelevant_drinks = d_i_matrix[np.where(
         np.any(np.logical_and(dislikes_vec, d_i_matrix), axis=1))]
     rel = LA.norm(relevant_drinks, axis=0)
     nrel = LA.norm(irrelevant_drinks, axis=0)
-    return alpha * likes_vec + beta * rel + gamma * nrel
+    result = alpha * likes_vec + beta * rel + gamma * nrel
+    if trim:
+        result = np.maximum(result, 0.0)
+    return result
 
 
 @app.route("/likes", methods=["POST"])
