@@ -155,14 +155,6 @@ def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gam
     return result
 
 
-@app.route("/likes", methods=["POST"])
-def add_like():
-    global likes
-    likes = [normalize_ingredient(i)
-             for i in request.args.get("likes").split(',') if len(i) > 0]
-    return json.dumps([])
-
-
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
     global likes
