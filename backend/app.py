@@ -140,7 +140,7 @@ def cosine_sim_ranking_ids(query_vec, d_i_matrix):
     return np.argsort(sims)[::-1]
 
 
-def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.8, gamma=0.1, trim=False):
+def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.1, gamma=0.1, trim=True):
     like_ids = np.where(
         np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))[0]
     dislike_ids = np.where(
@@ -168,7 +168,7 @@ def add_dislike():
     global likes
     likes = [normalize_ingredient(i)
              for i in request.args.get("likes").split(',') if len(i) > 0]
-    
+
     ingredient_index = ingredient_name_index()
     d_i_matrix = drink_ingredient_matrix(ingredient_index)
     global dislikes
