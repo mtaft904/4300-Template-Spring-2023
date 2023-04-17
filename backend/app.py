@@ -178,7 +178,6 @@ def add_dislike():
     dislikes_vec = vectorize_query(dislikes, ingredient_index)
     query_vec = rocchio_update(likes_vec, dislikes_vec, d_i_matrix)
     top_10 = cosine_sim_ranking_ids(query_vec, d_i_matrix)[:10]
-
     keys = ["drink_id", "drink", "ingredients", "method"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
                         for i in top_10])
@@ -200,5 +199,12 @@ def like_drink():
 def dislike_drink():
     drink_id = request.args.get("drink_id")
     sql_add_dislike(drink_id)
+
+@app.route("/get_popularity", methods=["POST"])
+def get_popularity():
+    drink_id_list = request.args.get("drink_id_list")
+    popularity_list = list(map(drink_popularity, drink_id_list))
+    return json.dumps({'popularity': popularity_list}) 
+
 
 # app.run(debug=True)
