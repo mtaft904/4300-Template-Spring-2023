@@ -57,6 +57,11 @@ def sql_search(query):
     return json.dumps([dict(zip(keys, i)) for i in data])
     # return data
 
+# def sql_add_like(drink_id):
+#     read_query_sql = f"""READ * FROM ratings where ratings.drink_id IS DRINK_ID"""
+#     data = mysql_engine.query_selector(read_query_sql)
+#     write_query_sql = f"""UPDATE ratings SET likes = likes + 1 WHERE drink_id = {drink_id}"""
+
 
 def normalize_ingredient(ingredient):
     return normalize('NFC', ingredient.lower())
@@ -159,5 +164,17 @@ def add_dislike():
                         for i in top_10])
 
     return result
+
+#increments the number of likes for a drink by 1
+@app.route("/add_like", methods=["POST"])
+def like_drink():
+    drink_id = request.args.get("drink_id")
+    sql_add_like(drink_id)
+
+#increments the number of likes for a drink by 1
+@app.route("/add_dislike", methods=["POST"])
+def dislike_drink():
+    drink_id = request.args.get("drink_id")
+    sql_add_dislike(drink_id)
 
 # app.run(debug=True)
