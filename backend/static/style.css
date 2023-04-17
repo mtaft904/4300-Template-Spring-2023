@@ -55,7 +55,7 @@
     align-items: center;
     margin-top: 10px;
     padding: 12px;
-    width: 600px;
+    width: 100%;
 }
 
 .input-box img {
@@ -78,7 +78,7 @@
 }
 
 .answer-box {
-    width: 700px;
+    width: 100%;
     margin-top: 50px;
 }
 
@@ -105,7 +105,7 @@
 
 .likes {
     display: flex;
-    width: 600px;
+    width: 100%;
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
@@ -119,4 +119,22 @@
 
 .submit:hover {
     background-color: darkorange;
+}
+
+.column {
+    width: 30%;
+    margin: 50px;
+    justify-content: center;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+#response {
+    width: 600px;
 }

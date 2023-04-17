@@ -144,6 +144,10 @@ def add_like():
 
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
+    global likes
+    likes = [normalize_ingredient(i)
+             for i in request.args.get("likes").split(',') if len(i) > 0]
+    
     ingredient_index = ingredient_name_index()
     d_i_matrix = drink_ingredient_matrix(ingredient_index)
     global dislikes
