@@ -82,6 +82,27 @@ def drink_ingredient_matrix(ingredient_index):
     return result
 
 
+def sql_add_like(drink_id):
+    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    mysql_engine.query_executor(query_sql)
+
+
+def sql_add_dislike(drink_id):
+    query_sql = f"""UPDATE drinkdb.ratings SET dislikes = dislikes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    mysql_engine.query_executor(query_sql)
+
+
+def drink_popularity(drink_id):
+    query_sql = f"""SELECT likes, dislikes FROM drinkdb.ratings WHERE drink_id = '%%{drink_id}%%'"""
+    data = mysql_engine.query_selector(query_sql)
+    likes, dislikes = data.first()
+    return likes - dislikes
+
+
+def rank_ids_by_popularity(ids):
+    return sorted(ids, key=lambda id: drink_popularity(id), reverse=True)
+
+
 @app.route("/")
 def home():
     return render_template('base.html', title="sample html")
@@ -163,5 +184,21 @@ def add_dislike():
                         for i in top_10])
 
     return result
+
+# increments the number of likes for a drink by 1
+
+
+@app.route("/add_like", methods=["POST"])
+def like_drink():
+    drink_id = request.args.get("drink_id")
+    sql_add_like(drink_id)
+
+# increments the number of likes for a drink by 1
+
+
+@app.route("/add_dislike", methods=["POST"])
+def dislike_drink():
+    drink_id = request.args.get("drink_id")
+    sql_add_dislike(drink_id)
 
 # app.run(debug=True)
