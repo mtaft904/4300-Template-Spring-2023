@@ -87,6 +87,16 @@ def drink_ingredient_matrix(ingredient_index):
     return result
 
 
+def sql_add_like(drink_id):
+    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    mysql_engine.query_executor(query_sql)
+
+
+def sql_add_dislike(drink_id):
+    query_sql = f"""UPDATE drinkdb.ratings SET dislikes = dislikes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    mysql_engine.query_executor(query_sql)
+
+
 @app.route("/")
 def home():
     return render_template('base.html', title="sample html")
