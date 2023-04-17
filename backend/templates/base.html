@@ -15,14 +15,12 @@
             <div id="inputcols" class="row">
                 <div class="column">
                     <h1 id="prompt">Choose some ingredients you like:</h1>
-                    <div class="likes" id="user_likes">
-                    </div>
                     <div class="input-box" onclick="sendFocus(filter-text-val)">
                         <img src="{{ url_for('static', filename='images/mag.png') }}" />
                         <input placeholder="Search for an ingredient" id="filter-text-val"
                             onkeyup="filterText('filter-text-val', 'answer-box')">
                     </div>
-                    <div id="submitButton">
+                    <div class="likes" id="user_likes">
                     </div>
                     <div class="answer-box" id="answer-box">
 
@@ -30,14 +28,14 @@
                 </div>
                 <div class="column">
                     <h1 id="prompt">Choose some ingredients you dislike:</h1>
-                    <div class="likes" id="user_dislikes">
-                    </div>
+
                     <div class="input-box" onclick="sendFocus('filter-text-val-2')">
                         <img src="{{ url_for('static', filename='images/mag.png') }}" />
                         <input placeholder="Search for an ingredient" id="filter-text-val-2"
                             onkeyup="filterText('filter-text-val-2', 'answer-box-2')">
                     </div>
-                    <div id="submitButton">
+
+                    <div class="likes" id="user_dislikes">
                     </div>
 
                     <div class="answer-box" id="answer-box-2">
@@ -45,7 +43,7 @@
                     </div>
 
                 </div>
-                <div style="margin-top: 75px">
+                <div style="margin-top: 155px">
                     <button type="submit" id="nextButton" class="ingredient submit"
                         onclick="sendResults()">Submit</button>
                 </div>
@@ -109,12 +107,33 @@
         }
 
         function userLikesTemplate(ingredient) {
-            return `<p class='episode-desc ingredient' style="border:2px solid green">${ingredient}</p>`
+            return `<button class='episode-desc ingredient' style='border:2px solid green' onclick='removeLike(this)'>${ingredient}</button>`
         }
 
         function userDislikesTemplate(ingredient) {
-            return `<p class='episode-desc ingredient' style="border:2px solid red">${ingredient}</p>`
+            return `<p class='episode-desc ingredient' style='border:2px solid red' onclick='removeDislike(this)'>${ingredient}</p>`
         }
+
+        function removeLike(element) {
+            var ingredient = element.innerHTML;
+            var index = likes.indexOf(ingredient);
+            if (index > -1) {
+                likes.splice(index, 1);
+            }
+
+            element.remove();
+        }
+
+        function removeDislike(element) {
+            var ingredient = element.innerHTML;
+            var index = dislikes.indexOf(ingredient);
+            if (index > -1) {
+                dislikes.splice(index, 1);
+            }
+            element.remove();
+        }
+
+
 
         function sendFocus(id) {
             document.getElementById(id).focus()
@@ -136,51 +155,6 @@
 
         }
 
-        function sendUserLikes(likes_box) {
-            jsonResponse = []
-            console.log('test')
-            let i = 0
-            fetch("/likes?" + new URLSearchParams({ likes: likes }).toString(), { method: "POST" })
-                // .then((response) => response.json())
-                // .then((data) => {data.forEach(drinkDict => {
-                //     let drink = data[i]['drink']
-                //     let ingredients = data[i]['ingredients']
-                //     let method = data[i]['method']
-                //     let tempDiv = document.createElement("div")
-                //     tempDiv.innerHTML = answerBoxTemplate(drink, ingredients, method)
-                //     document.getElementById("responses").appendChild(tempDiv)
-                //     i++
-                //     })})
-                .then((response) => response.json())
-                .then((data) => {
-                    //document.getElementById("responses").innerHTML = text;
-                });
-        }
-
-        function sendUserDislikes() {
-            jsonResponse = []
-            let i = 0
-            document.getElementById("responses").innerHTML = '<h2>Here are some drinks you might like!</h2>'
-            fetch("/dislikes?" + new URLSearchParams({ dislikes: dislikes }).toString(), { method: "POST" })
-                // .then((response) => response.json())
-                // .then((data) => console.log(data)
-                // );
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data)
-                    data.forEach(drinkDict => {
-                        let drink = data[i]['drink']
-                        let ingredients = data[i]['ingredients']
-                        let method = data[i]['method']
-                        let tempDiv = document.createElement("div")
-                        tempDiv.innerHTML = answerBoxTemplate(drink, ingredients, method)
-                        document.getElementById("responses").appendChild(tempDiv)
-                        i++
-                    })
-                })
-            document.getElementById("user_likes").innerHTML = ''
-            document.getElementById("answer-box").innerHTML = ''
-        }
 
         async function sendResults() {
             jsonResponse = []
