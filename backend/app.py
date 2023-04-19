@@ -84,21 +84,18 @@ def drink_ingredient_matrix(ingredient_index):
 
 def sql_add_like(drink_id):
     drink_id = int(drink_id)
-    print(drink_id)
     query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
     mysql_engine.query_executor(query_sql)
 
 
 def sql_add_dislike(drink_id):
     drink_id = int(drink_id)
-    print(drink_id)
     query_sql = f"""UPDATE drinkdb.ratings SET likes = likes - 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
     mysql_engine.query_executor(query_sql)
 
 
 def drink_popularity(drink_id):
     drink_id = int(drink_id)
-    print(drink_id)
     query_sql = f"""SELECT likes, dislikes FROM drinkdb.ratings WHERE drink_id = '{drink_id}'"""
     data = mysql_engine.query_selector(query_sql)
     likes, dislikes = data.first()
@@ -204,11 +201,9 @@ def dislike_drink():
 @app.route("/get_popularity", methods=["POST"])
 def get_popularity():
     drink_id_list = request.args.get("drink_id_list").split(',')
-    print(drink_id_list)
     popularity_list = []
     for drink_id in drink_id_list:
         popularity_list.append(drink_popularity(drink_id))
-    print(popularity_list)
     return json.dumps({'popularity': popularity_list})
 
 
