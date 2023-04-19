@@ -83,17 +83,23 @@ def drink_ingredient_matrix(ingredient_index):
 
 
 def sql_add_like(drink_id):
-    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    drink_id = int(drink_id)
+    print(drink_id)
+    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
     mysql_engine.query_executor(query_sql)
 
 
 def sql_add_dislike(drink_id):
-    query_sql = f"""UPDATE drinkdb.ratings SET dislikes = dislikes + 1 WHERE drink_id = '%%{drink_id}%%'"""
+    drink_id = int(drink_id)
+    print(drink_id)
+    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes - 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
     mysql_engine.query_executor(query_sql)
 
 
 def drink_popularity(drink_id):
-    query_sql = f"""SELECT likes, dislikes FROM drinkdb.ratings WHERE drink_id = '%%{drink_id}%%'"""
+    drink_id = int(drink_id)
+    print(drink_id)
+    query_sql = f"""SELECT likes, dislikes FROM drinkdb.ratings WHERE drink_id = '{drink_id}'"""
     data = mysql_engine.query_selector(query_sql)
     likes, dislikes = data.first()
     return likes - dislikes
@@ -183,6 +189,8 @@ def add_dislike():
 def like_drink():
     drink_id = request.args.get("drink_id")
     sql_add_like(drink_id)
+    return json.dumps({'popularity': drink_popularity(drink_id)})
+    
 
 # increments the number of likes for a drink by 1
 
@@ -191,12 +199,17 @@ def like_drink():
 def dislike_drink():
     drink_id = request.args.get("drink_id")
     sql_add_dislike(drink_id)
+    return json.dumps({'popularity': drink_popularity(drink_id)})
 
 @app.route("/get_popularity", methods=["POST"])
 def get_popularity():
-    drink_id_list = request.args.get("drink_id_list")
-    popularity_list = list(map(drink_popularity, drink_id_list))
-    return json.dumps({'popularity': popularity_list}) 
+    drink_id_list = request.args.get("drink_id_list").split(',')
+    print(drink_id_list)
+    popularity_list = []
+    for drink_id in drink_id_list:
+        popularity_list.append(drink_popularity(drink_id))
+    print(popularity_list)
+    return json.dumps({'popularity': popularity_list})
 
 
 # app.run(debug=True)
