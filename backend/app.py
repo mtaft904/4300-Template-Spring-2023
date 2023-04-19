@@ -92,7 +92,7 @@ def sql_add_like(drink_id):
 def sql_add_dislike(drink_id):
     drink_id = int(drink_id)
     print(drink_id)
-    query_sql = f"""UPDATE drinkdb.ratings SET likes = likes - 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
+    query_sql = f"""UPDATE drinkdb.ratings SET dislikes = dislikes + 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
     mysql_engine.query_executor(query_sql)
 
 
@@ -190,7 +190,7 @@ def like_drink():
     drink_id = request.args.get("drink_id")
     sql_add_like(drink_id)
     return json.dumps({'popularity': drink_popularity(drink_id)})
-    
+
 
 # increments the number of likes for a drink by 1
 
@@ -200,6 +200,7 @@ def dislike_drink():
     drink_id = request.args.get("drink_id")
     sql_add_dislike(drink_id)
     return json.dumps({'popularity': drink_popularity(drink_id)})
+
 
 @app.route("/get_popularity", methods=["POST"])
 def get_popularity():
