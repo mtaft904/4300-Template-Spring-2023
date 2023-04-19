@@ -187,7 +187,7 @@ def like_drink():
     drink_id = request.args.get("drink_id")
     sql_add_like(drink_id)
     return json.dumps({'popularity': drink_popularity(drink_id)})
-    
+
 
 # increments the number of likes for a drink by 1
 
@@ -197,6 +197,7 @@ def dislike_drink():
     drink_id = request.args.get("drink_id")
     sql_add_dislike(drink_id)
     return json.dumps({'popularity': drink_popularity(drink_id)})
+
 
 @app.route("/get_popularity", methods=["POST"])
 def get_popularity():
