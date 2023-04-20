@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
     rel="stylesheet">
+    <script src="https://kit.fontawesome.com/9c4fddd5f0.js" crossorigin="anonymous"></script>
 
 <body>
     <div class="full-body-container">
@@ -45,7 +46,7 @@
                 </div>
                 <div style="margin-top: 155px">
                     <button type="submit" id="nextButton" class="ingredient submit"
-                        onclick="sendResults()">Submit</button>
+                        onclick="renderResultsByRel()">Submit</button>
                 </div>
 
             </div>
@@ -76,14 +77,22 @@
         let step2 = false;
 
         function answerBoxTemplate(drink_id, drink, ingredients, method) {
-            return `<div class=''>
-                <h3 class='episode-title'>${drink}</h3>
-                <p class='episode-desc'>${ingredients}</p>
-                <p class='episode-desc'>${method}</p>
-                <button id="${drink_id}_like" onclick="add_like(${drink_id})">Like</button>
-                <p id='${drink_id}'>${'test'}</p>
-                <button id="${drink_id}_dislike" onClick="add_dislike(${drink_id})">Dislike</button>
-            </div>`
+            return `<div class='drink'>
+                        <div class="row">
+                            <img src="/static/images/search.png">
+                            <div>
+                                <h3 class='episode-title'>${drink}</h3>
+                                <p class='episode-desc'>${ingredients}</p>
+                                <p class='episode-desc'>${method}</p>
+                            </div>
+                        </div>
+                        <div class="pop-div row">
+                            <button id="${drink_id}_like" class="pop-button" onclick="add_like(${drink_id})"><i class="fa-solid fa-arrow-up"></i></button>
+                            
+                            <p id='${drink_id}' class="popularity" >${'test'}</p>
+                            <button id="${drink_id}_dislike" class="pop-button" onClick="add_dislike(${drink_id})"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                    </div>`
         }
 
         function answerBoxButton(ingredient) {
@@ -142,7 +151,6 @@
 
         function filterText(id, answer_box) {
             document.getElementById(answer_box).innerHTML = ""
-            console.log(document.getElementById(id).value)
             fetch("/episodes?" + new URLSearchParams({ title: document.getElementById(id).value }).toString())
                 .then((response) => response.json())
                 .then((data) => data.forEach(row => {
@@ -156,8 +164,8 @@
 
         }
 
-        //we need to rewite this function so it can take in a sort order or we need to make a new render results function that will take in the list and render it
-        async function sendResults() {
+        //
+        async function renderResultsByRel() {
             jsonResponse = []
             let i = 0
             let drink_id_list = []
@@ -175,40 +183,51 @@
                     data.forEach(async (drinkDict) => {
                         let drink_id = data[i]['drink_id']
                         drink_id_list.push(drink_id)
-                        // console.log(drink_id_list)
                         let drink = data[i]['drink']
                         let ingredients = data[i]['ingredients']
                         let method = data[i]['method']
                         let tempDiv = document.createElement("div")
                         tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method)
                         document.getElementById("responses").appendChild(tempDiv)
-                        // await get_likes_and_dislikes(drink_id)
                         i++
                     })
                 }).then(async ()=> await get_likes_and_dislikes(drink_id_list))
             
-            document.getElementById("inputcols").remove();
+            
+            document.getElementById("inputcols").innerHTML = '';
             document.getElementById("user_likes").innerHTML = ''
             document.getElementById("answer-box").innerHTML = ''
 
         }
 
-        //Returns a list of dicts of the drink results by fecting the api
-        function getResults() {
+        //re-renders the screen ordering the results by popularity
+        async function renderResultsByPop() {
+            const response1 = await fetch("/dislikes?" + new URLSearchParams({ dislikes: dislikes, likes: likes }).toString(), { method: "POST" });
+            const drinkDict = await response1.json();
             let drink_id_list = []
-            fetch("/dislikes?" + new URLSearchParams({ dislikes: dislikes, likes: likes }).toString(), { method: "POST" })
-                .then((response) => response.json())
-                .then((data) => {
-                }).then(async ()=> await get_likes_and_dislikes(drink_id_list))
-                .then((response) => response.json())
+            drinkDict.forEach((drink => drink_id_list.push(drink["drink_id"])))
+
+            const response2 = await fetch("/get_popularity?" + new URLSearchParams({ drink_id_list: drink_id_list}).toString(), { method: "POST" });
+            const dict = await response2.json();
+            let popList = dict["popularity"]
+            let sortedPop = [...popList].sort()
+            let i = Object.keys(drinkDict).length
+            while (i > 0) {
+                let idx = popList.indexOf(sortedPop.pop())
+                popList[idx] = null
+                let drink_id = drinkDict[idx]['drink_id']
+                let drink = drinkDict[idx]['drink']
+                let ingredients = drinkDict[idx]['ingredients']
+                let method = drinkDict[idx]['method']
+                let tempDiv = document.createElement("div")
+                tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method)
+                document.getElementById("responses").appendChild(tempDiv)
+                i--
+            }
+            get_likes_and_dislikes(drink_id_list)
         }
 
-        //renderResults(orderby: string) rerenders the innerHTML of the results based on the sortby option chosen
-        async function renderResults(orderBy) {
-            document.getElementById("responses").innerHTML = ''
-        }
-
-
+        //get_likes_and_dislikes(drink_id_list) re-renders the popularity for each drink on the screen (drink_id_list)
         function get_likes_and_dislikes(drink_id_list) {
             fetch("/get_popularity?" + new URLSearchParams({ drink_id_list: drink_id_list}).toString(), { method: "POST" })
             .then((response) => response.json())
@@ -218,6 +237,7 @@
                     }})
         }
 
+        //add_like(drink_id) makes a call to the api to add a like to drink [drink_id] in the database, rerenders the popularity onscreen for this drink, and enables/disables the dislikes/like buttons
         function add_like(drink_id) {
             fetch("/add_like?" + new URLSearchParams({ drink_id: drink_id}).toString(), { method: "POST" })
                 .then((response) => response.json())
@@ -228,6 +248,7 @@
                     })
         }
 
+        //add_dislike(drink_id) makes a call to the api to add a dislike to drink [drink_id] in the database, rerenders the popularity onscreen for this drink, and enables/disables the likes/dislike buttons
         function add_dislike(drink_id) {
             fetch("/add_dislike?" + new URLSearchParams({ drink_id: drink_id}).toString(), { method: "POST" })
                 .then((response) => response.json())
@@ -240,7 +261,9 @@
 
         function changeSort(selectObject) {
             let value = selectObject.value;
-            renderResults(value)
+            document.getElementById("responses").innerHTML = ''
+            if (value == "popularity") renderResultsByPop()
+            else renderResultsByRel()
         }
 
     </script>
