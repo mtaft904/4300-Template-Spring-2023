@@ -84,7 +84,7 @@
                         <div class="result row">
                             <div>
                                 <h3 class='episode-title'>${drink}</h3>
-                                <p class='sim'>${sim}% Relevant</p>
+                                <p class='sim'>${(sim *100).toFixed(2)}% Relevant</p>
                                 <p class='episode-desc'>${ingredients}</p>
                                 <p class='episode-desc'>${method}</p>
                                 <div class="pop-div row">
@@ -190,7 +190,7 @@
                         let drink = data[i]['drink']
                         let ingredients = data[i]['ingredients']
                         let method = data[i]['method']
-                        let sim = data[i]['similarity'].toFixed(3);
+                        let sim = data[i]['similarity'];
                         let tempDiv = document.createElement("div")
                         tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                         document.getElementById("responses").appendChild(tempDiv)
@@ -225,8 +225,9 @@
                 let drink = drinkDict[idx]['drink']
                 let ingredients = drinkDict[idx]['ingredients']
                 let method = drinkDict[idx]['method']
+                let sim = data[i]['similarity'];
                 let tempDiv = document.createElement("div")
-                tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method)
+                tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                 document.getElementById("responses").appendChild(tempDiv)
                 i--
             }
