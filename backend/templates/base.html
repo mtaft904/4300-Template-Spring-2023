@@ -79,11 +79,12 @@
         let dislikes = []
         let step2 = false;
 
-        function answerBoxTemplate(drink_id, drink, ingredients, method) {
+        function answerBoxTemplate(drink_id, drink, ingredients, method, sim) {
             return `<div class='drink'>
                         <div class="result row">
                             <div>
                                 <h3 class='episode-title'>${drink}</h3>
+                                <p class='sim'>Relevance = ${sim}</p>
                                 <p class='episode-desc'>${ingredients}</p>
                                 <p class='episode-desc'>${method}</p>
                                 <div class="pop-div row">
@@ -189,8 +190,9 @@
                         let drink = data[i]['drink']
                         let ingredients = data[i]['ingredients']
                         let method = data[i]['method']
+                        let sim = data[i]['similarity'].toFixed(3);
                         let tempDiv = document.createElement("div")
-                        tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method)
+                        tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                         document.getElementById("responses").appendChild(tempDiv)
                         i++
                     })
