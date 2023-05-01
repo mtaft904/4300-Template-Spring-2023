@@ -211,6 +211,8 @@ h2 {
 
 .show-reviews:hover {
     border: 2px solid darkorange;
+    cursor: pointer;
+
 }
 
 #filter {
@@ -227,4 +229,5 @@ h2 {
 
 .filter-button:hover {
     border-color: orange;
+    cursor: pointer;
 }
