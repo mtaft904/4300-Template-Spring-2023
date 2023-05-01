@@ -83,7 +83,7 @@
         let dislikes = []
         let step2 = false;
 
-        function answerBoxTemplate(drink_id, drink, ingredients, method, sim) {
+        function answerBoxTemplate(drink_id, drink, ingredients, method, sim, comments) {
             return `<div class='drink'>
                         <div class="result row">
                             <div>
@@ -95,7 +95,7 @@
                                     <button id="${drink_id}_like" class="pop-button" onclick="add_like(${drink_id})"><i class="fa-solid fa-arrow-up"></i></button>
                                     <p id='${drink_id}' class="popularity" >${'test'}</p>
                                     <button id="${drink_id}_dislike" class="pop-button" onClick="add_dislike(${drink_id})"><i class="fa-solid fa-arrow-down"></i></button>
-                                    <button class="show-reviews" style="margin-left: 25px" id="${drink_id}-show-review" onClick="showReviews('${drink_id}')">Show Reviews</button>
+                                    <button class="show-reviews" style="margin-left: 25px" id="${drink_id}-show-review" onClick="showReviews('${drink_id}', '${encodeURIComponent(JSON.stringify(comments))}')">Show Reviews</button>
                                 </div>
                             </div>
                             <img class="drink-img" src="/static/images/${drink_id}.jpg">
@@ -201,7 +201,8 @@
                         let method = data[i]['method']
                         let sim = data[i]['similarity'];
                         let tempDiv = document.createElement("div")
-                        tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
+                        let comments = data[i]['comments'];
+                        tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim, comments)
                         document.getElementById("responses").appendChild(tempDiv)
                         i++
                     })
@@ -309,16 +310,23 @@
             else renderResultsByRel()
         }
 
-        function showReviews(id) {
+        function showReviews(id, comments) {
 
-            mockComments = ["This drink sucks.", "This drink is amazing! 10/10.", "Instructions are confusing"];
+            comments = JSON.parse(decodeURIComponent(comments))
             document.getElementById(`${id}-show-review`).style.visibility = "hidden";
             document.getElementById(`${id}_reviews`).innerHTML = "<h2>User Reviews</h2>"
-            mockComments.forEach((comment) => {
+            comments.forEach((row) => {
+                author = row['author'];
+                comment = row['content'];
                 tempDiv = document.createElement("p");
-                tempDiv.innerHTML = `${comment}`;
+                tempDiv.innerHTML = `"${comment}" <span style="font-weight:bolder"> - ${author}</span>`;
                 document.getElementById(`${id}_reviews`).appendChild(tempDiv);
             })
+            if (comments.length == 0) {
+                tempDiv = document.createElement("p");
+                tempDiv.innerHTML = "No User Reviews :("
+                document.getElementById(`${id}_reviews`).appendChild(tempDiv);
+            }
             hideButton = document.createElement("div");
             hideButton.innerHTML = `<button class="show-reviews" onClick="hideReviews('${id}')">Hide Reviews</button>`
             document.getElementById(`${id}_reviews`).appendChild(hideButton);
