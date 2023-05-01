@@ -88,7 +88,7 @@ def drink_ingredient_matrix(ingredient_index):
 def get_comments(drink_id):
     query_sql = f"""SELECT author, content FROM drinkdb.comments WHERE drink_id = '{drink_id}'"""
     data = mysql_engine.query_selector(query_sql)
-    return [dict([('author', a), ('content', escape(c))]) for a, c in data]
+    return [dict([('author', escape(a)), ('content', escape(c))]) for a, c in data]
 
 
 def sql_add_like(drink_id):
