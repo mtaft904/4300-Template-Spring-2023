@@ -8,6 +8,7 @@ from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 from unicodedata import normalize
 from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize as sknorm
+from html import escape
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -87,7 +88,7 @@ def drink_ingredient_matrix(ingredient_index):
 def get_comments(drink_id):
     query_sql = f"""SELECT author, content FROM drinkdb.comments WHERE drink_id = '{drink_id}'"""
     data = mysql_engine.query_selector(query_sql)
-    return [dict([('author', a), ('content', c)]) for a, c in data]
+    return [dict([('author', a), ('content', escape(c))]) for a, c in data]
 
 
 def sql_add_like(drink_id):
