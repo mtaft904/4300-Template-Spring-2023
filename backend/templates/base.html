@@ -176,7 +176,9 @@
             jsonResponse = []
             let i = 0
             let drink_id_list = []
-            document.getElementById("responseHeader").innerHTML = '<h2>Here are some drinks you might like!</h2>'
+            document.getElementById("responseHeader").innerHTML = `
+            <a href='/'><div class='search-again'>Search for another drink</div></a>
+            <h2>Here are some drinks you might like!</h2>`
             document.getElementById("filter").innerHTML = `
                 <label for="filter">Sort by:</label>
 

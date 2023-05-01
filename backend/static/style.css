@@ -212,3 +212,17 @@ h2 {
 .show-reviews:hover {
     border: 2px solid darkorange;
 }
+
+
+.search-again {
+    padding: 15px;
+    border: 2px solid black;
+    border-radius: 50px;
+    width: 250px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.search-again:hover {
+    background-color: darkorange;
+}
