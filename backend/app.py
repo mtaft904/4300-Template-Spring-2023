@@ -6,6 +6,8 @@ from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 from unicodedata import normalize
+from scipy.sparse.linalg import svds
+from sklearn.preprocessing import normalize as sknorm
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -160,6 +162,23 @@ def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.1, gam
     return result
 
 
+def svd_decomp(d_i_matrix, k=40):
+    drinks_compressed, s, ingredients_compressed = svds(d_i_matrix, k=k)
+    return (drinks_compressed, s, ingredients_compressed)
+
+
+def closest_ingredients(ingredient_id, ingredient_representation_in, k=10):
+    # Given an ingredient and ingredient representation, returns the best k matches as (ingedient_id, sim)
+    sims = ingredient_representation_in.dot(
+        ingredient_representation_in[ingredient_id, :])
+    asort = np.argsort(-sims)[:k+1]
+    return [(i, sims[i]) for i in asort[1:] if i != ingredient_id]
+
+
+def normalize_ingredients_compressed(ingredients_compressed):
+    return sknorm(ingredients_compressed.transpose(), axis=1)
+
+
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
     global likes
@@ -178,6 +197,16 @@ def add_dislike():
     keys = ["drink_id", "drink", "ingredients", "method", "similarity"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(id)+[sim]))
                         for id, sim in top_10])
+
+    _, _, ingredients_compressed = svd_decomp(d_i_matrix)
+    ingredients_compressed_norm = normalize_ingredients_compressed(
+        ingredients_compressed)
+    closest = closest_ingredients(ingredient_index[likes[0] if likes else normalize_ingredient(
+        'champagne')], ingredients_compressed_norm)
+    print(closest)
+    ingredient_list = [i for i in ingredient_index]
+    for i, s in closest:
+        print(ingredient_list[i], s)
 
     return result
 
