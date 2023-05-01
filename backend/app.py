@@ -87,7 +87,7 @@ def drink_ingredient_matrix(ingredient_index):
 def get_comments(drink_id):
     query_sql = f"""SELECT author, content FROM drinkdb.comments WHERE drink_id = '{drink_id}'"""
     data = mysql_engine.query_selector(query_sql)
-    return [(a, c) for a, c in data]
+    return [dict([('author', a), ('content', c)]) for a, c in data]
 
 
 def sql_add_like(drink_id):
@@ -216,10 +216,10 @@ def add_dislike():
     dislikes_vec = vectorize_query(dislikes, ingredient_index)
     query_vec = rocchio_update(likes_vec, dislikes_vec, d_i_matrix)
     top_10 = cosine_sim_ranking(query_vec, d_i_matrix)[:10]
-    keys = ["drink_id", "drink", "ingredients", "method", "similarity"]
-    result = json.dumps([dict(zip(keys, lookup_drink_by_id(id)+[sim]))
+    keys = ["drink_id", "drink", "ingredients",
+            "method", "similarity", "comments"]
+    result = json.dumps([dict(zip(keys, lookup_drink_by_id(id)+[sim, get_comments(id)]))
                         for id, sim in top_10])
-
     return result
 
 # increments the number of likes for a drink by 1
