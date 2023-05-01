@@ -84,6 +84,12 @@ def drink_ingredient_matrix(ingredient_index):
     return result
 
 
+def get_comments(drink_id):
+    query_sql = f"""SELECT author, content FROM drinkdb.comments WHERE drink_id = '{drink_id}'"""
+    data = mysql_engine.query_selector(query_sql)
+    return [(a, c) for a, c in data]
+
+
 def sql_add_like(drink_id):
     drink_id = int(drink_id)
     query_sql = f"""UPDATE drinkdb.ratings SET likes = likes + 1 WHERE drink_id = '{drink_id}' LIMIT 1"""
@@ -189,7 +195,7 @@ def query_expand(ingredients, ingredient_index, d_i_matrix):
     for i in ingredients:
         matches.extend(closest_ingredients(
             ingredient_index[i], ingredients_compressed_norm))
-        
+
     matches = sorted(matches, key=lambda t: t[1], reverse=True)
     ingredient_list = list(ingredient_index)
     return [(i, ingredient_list[i]) for i, _ in matches[:3]]
