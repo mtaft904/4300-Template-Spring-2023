@@ -199,7 +199,7 @@ INSERT INTO ingredients VALUE(21, "Lime");
 INSERT INTO ingredients VALUE(21, "Mint Sprigs");
 INSERT INTO ingredients VALUE(21, "White Cane Sugar");
 INSERT INTO ingredients VALUE(21, "Soda Water");
-INSERT INTO ingredients VALUE(22, "Smirnoff Vodka");
+INSERT INTO ingredients VALUE(22, "Vodka");
 INSERT INTO ingredients VALUE(22, "Ginger Beer");
 INSERT INTO ingredients VALUE(22, "Lime");
 INSERT INTO ingredients VALUE(23, "White Rum");
