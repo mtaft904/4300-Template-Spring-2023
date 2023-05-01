@@ -26,9 +26,10 @@ CREATE TABLE ratings(
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments(
     drink_id int,
-    author varchar(64),
-    content varchar(1024)
+    author nvarchar(64),
+    content nvarchar(1024)
 );
+ALTER TABLE comments CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 INSERT INTO drinks VALUE(0, "Bellini", "100 ml Prosecco,50 ml White Peach Puree", "Pour peach puree into the mixing glass with ice, add the Prosecco wine. Stir gently and pour in a chilled flute glass.  Note: PUCCINI - Fresh Mandarin Orange Juice; ROSSINI - Fresh Strawberry Puree; TINTORETTO - Fresh Pomegranate Juice.");
 INSERT INTO drinks VALUE(1, "Black Russian", "50 ml Vodka,20 ml Coffee Liqueur", "Pour the ingredients into the old fashioned glass filled with ice cubes. Stir gently.  Note: WHITE RUSSIAN - Float fresh cream on the top and stir in slowly.");
