@@ -121,7 +121,7 @@ def lookup_drink_by_id(id):
     query_sql = f"""SELECT * FROM drinkdb.drinks WHERE drink_id = {id} LIMIT 1"""
     data = mysql_engine.query_selector(query_sql)
     for row in data:
-        return row
+        return list(row)
 
 
 def vectorize_query(query, ingredient_index):
@@ -131,16 +131,18 @@ def vectorize_query(query, ingredient_index):
     return result
 
 
-def cosine_sim_ranking_ids(query_vec, d_i_matrix):
+def cosine_sim_ranking(query_vec, d_i_matrix):
     if not np.any(query_vec):
-        return np.arange(d_i_matrix.shape[0])
+        size = d_i_matrix.shape[0]
+        return list(zip(np.arange(size), [0]*size))
     q_norm = LA.norm(query_vec)
     doc_norms = LA.norm(d_i_matrix, axis=1)
     sims = np.matmul(d_i_matrix, query_vec)
     sims /= doc_norms
     sims /= q_norm
 
-    return np.argsort(sims)[::-1]
+    rankings = np.argsort(sims)[::-1]
+    return list(zip(rankings, sims[rankings]))
 
 
 def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.1, gamma=0.1, trim=True):
@@ -172,10 +174,10 @@ def add_dislike():
     likes_vec = vectorize_query(likes, ingredient_index)
     dislikes_vec = vectorize_query(dislikes, ingredient_index)
     query_vec = rocchio_update(likes_vec, dislikes_vec, d_i_matrix)
-    top_10 = cosine_sim_ranking_ids(query_vec, d_i_matrix)[:10]
-    keys = ["drink_id", "drink", "ingredients", "method"]
-    result = json.dumps([dict(zip(keys, lookup_drink_by_id(i)))
-                        for i in top_10])
+    top_10 = cosine_sim_ranking(query_vec, d_i_matrix)[:10]
+    keys = ["drink_id", "drink", "ingredients", "method", "similarity"]
+    result = json.dumps([dict(zip(keys, lookup_drink_by_id(id)+[sim]))
+                        for id, sim in top_10])
 
     return result
 
