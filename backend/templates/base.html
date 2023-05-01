@@ -228,7 +228,7 @@
                 let drink = drinkDict[idx]['drink']
                 let ingredients = drinkDict[idx]['ingredients']
                 let method = drinkDict[idx]['method']
-                let sim = data[i]['similarity'];
+                let sim = drinkDict[idx]['similarity'];
                 let tempDiv = document.createElement("div")
                 tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                 document.getElementById("responses").appendChild(tempDiv)
