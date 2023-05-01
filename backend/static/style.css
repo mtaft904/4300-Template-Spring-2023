@@ -212,3 +212,19 @@ h2 {
 .show-reviews:hover {
     border: 2px solid darkorange;
 }
+
+#filter {
+    font-family: sans-serif;
+}
+
+.filter-button {
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 10px;
+    font-weight: bold;
+    background-color: inherit;
+}
+
+.filter-button:hover {
+    border-color: orange;
+}
