@@ -603,7 +603,7 @@ INSERT INTO comments VALUE(35, "Mark Norman", "The best. Ginger beer first, then
 INSERT INTO comments VALUE(50, "Michał Kowalczyk", "Absolutely delicious drink that tastes like a summer itself.");
 INSERT INTO comments VALUE(50, "Alex Tuns", "Best drink ever");
 INSERT INTO comments VALUE(50, "Daniel Saavedra", "alternatively to Prosecco (if you don't like it bubbly) you can also take regular white house wine");
-INSERT INTO comments VALUE(50, "Martina Ivanova", "Great! I had an awesome Aperol Spritz next to Duomo, Milan");
+INSERT INTO comments VALUE(50, "Martina Ivanova", "Great! I had an awesome Aperol Spritz next to Duomo, Milan 😍😋");
 INSERT INTO comments VALUE(56, "Cecile Jones", "One of the first drink I had when I visited Nassau Bahamas back in the 70-80's. It's a delicious fruity drink with a knockout punch because of delicious galliano..I met the most wonderful guy on that day ' you gonna coast on that one eh'... from that day we kept up a relationship for about 5 years...I lived in queens ny and he worked for an airline...it was wonderful..because of him I've gotten quite familiar with a few liqueurs...I will never forget the Bahamas!!!");
 INSERT INTO comments VALUE(66, "Martin Tužinčin", "Floridita in Havana have best Daiquiri");
 INSERT INTO comments VALUE(66, "Allen Kim", "I love it! Especially with strawberries.");
