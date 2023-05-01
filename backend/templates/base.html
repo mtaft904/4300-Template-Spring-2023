@@ -9,6 +9,10 @@
 
 <body>
     <div class="full-body-container">
+        <a href='/'>
+            <div id='search-again' style="visibility: hidden;">← Search for another drink!</div>
+        </a>
+
         <div class="top-text">
             <div class="google-colors">
                 <!-- <h1>DrinkGPT</h1> -->
@@ -18,10 +22,10 @@
             <div id="inputcols" class="row">
                 <div class="column">
                     <h1 id="prompt">Choose some ingredients you like:</h1>
-                    <div class="input-box" onclick="sendFocus(filter-text-val)">
+                    <div class="input-box" onclick="sendFocus(likes_search)">
                         <img src="{{ url_for('static', filename='images/mag.png') }}" />
-                        <input style="background-color:inherit" placeholder="Search for an ingredient"
-                            id="filter-text-val" onkeyup="filterText('filter-text-val', 'answer-box')">
+                        <input style="background-color:inherit" placeholder="Search for an ingredient" id="likes_search"
+                            onkeyup="filterText('likes_search', 'answer-box')">
                     </div>
                     <div class="likes" id="user_likes">
                     </div>
@@ -32,10 +36,10 @@
                 <div class="column">
                     <h1 id="prompt">Choose some ingredients you dislike:</h1>
 
-                    <div class="input-box" onclick="sendFocus('filter-text-val-2')">
+                    <div class="input-box" onclick="sendFocus('dislikes_search')">
                         <img src="{{ url_for('static', filename='images/mag.png') }}" />
                         <input style="background-color:inherit" placeholder="Search for an ingredient"
-                            id="filter-text-val-2" onkeyup="filterText('filter-text-val-2', 'answer-box-2')">
+                            id="dislikes_search" onkeyup="filterText('dislikes_search', 'answer-box-2')">
                     </div>
 
                     <div class="likes" id="user_dislikes">
@@ -84,17 +88,19 @@
                         <div class="result row">
                             <div>
                                 <h3 class='episode-title'>${drink}</h3>
-                                <p class='sim'>${sim}% Relevant</p>
+                                <p class='sim'>${(sim * 100).toFixed(2)}% Relevant</p>
                                 <p class='episode-desc'>${ingredients}</p>
                                 <p class='episode-desc'>${method}</p>
                                 <div class="pop-div row">
                                     <button id="${drink_id}_like" class="pop-button" onclick="add_like(${drink_id})"><i class="fa-solid fa-arrow-up"></i></button>
-                                    <span id='${drink_id}' class="popularity" >${'test'}</span>
+                                    <p id='${drink_id}' class="popularity" >${'test'}</p>
                                     <button id="${drink_id}_dislike" class="pop-button" onClick="add_dislike(${drink_id})"><i class="fa-solid fa-arrow-down"></i></button>
+                                    <button class="show-reviews" style="margin-left: 25px" id="${drink_id}-show-review" onClick="showReviews('${drink_id}')">Show Reviews</button>
                                 </div>
                             </div>
                             <img class="drink-img" src="/static/images/${drink_id}.jpg">
                         </div>
+                        <div id="${drink_id}_reviews" class="reviews-box"></div>
      
                     </div>`
         }
@@ -104,20 +110,21 @@
         }
 
         function appendIngredient(ingredient, id) {
-            if (id == 'filter-text-val-2') {
+            if (id == 'dislikes_search') {
                 if (!dislikes.includes(ingredient)) {
                     let tempDiv = document.createElement("div")
                     tempDiv.innerHTML = userDislikesTemplate(ingredient)
                     document.getElementById("user_dislikes").appendChild(tempDiv)
-                    dislikes.push(ingredient)
+                    dislikes.push(ingredient);
                 }
             }
             else if (!likes.includes(ingredient)) {
                 let tempDiv = document.createElement("div")
                 tempDiv.innerHTML = userLikesTemplate(ingredient)
                 document.getElementById("user_likes").appendChild(tempDiv)
-                likes.push(ingredient)
+                likes.push(ingredient);
             }
+            document.getElementById(id).value = "";
         }
 
         function userLikesTemplate(ingredient) {
@@ -173,11 +180,13 @@
             jsonResponse = []
             let i = 0
             let drink_id_list = []
-            document.getElementById("responseHeader").innerHTML = '<h2>Here are some drinks you might like!</h2>'
+            document.getElementById("search-again").style.visibility = 'visible';
+            document.getElementById("responseHeader").innerHTML = `
+            <h2>Here are some drinks you might like!</h2>`
             document.getElementById("filter").innerHTML = `
                 <label for="filter">Sort by:</label>
 
-                <select name="filter" id="filter" onChange="changeSort(this)">
+                <select name="filter" class="filter-button" id="filter" onChange="changeSort(this)">
                     <option value="relevance">Relevance</option>
                     <option value="popularity">Popularity</option>
                 </select>`
@@ -190,7 +199,7 @@
                         let drink = data[i]['drink']
                         let ingredients = data[i]['ingredients']
                         let method = data[i]['method']
-                        let sim = data[i]['similarity'].toFixed(3);
+                        let sim = data[i]['similarity'];
                         let tempDiv = document.createElement("div")
                         tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                         document.getElementById("responses").appendChild(tempDiv)
@@ -200,8 +209,8 @@
 
 
             document.getElementById("inputcols").innerHTML = '';
-            document.getElementById("user_likes").innerHTML = ''
-            document.getElementById("answer-box").innerHTML = ''
+            document.getElementById("user_likes").innerHTML = '';
+            document.getElementById("answer-box").innerHTML = '';
 
         }
 
@@ -225,8 +234,9 @@
                 let drink = drinkDict[idx]['drink']
                 let ingredients = drinkDict[idx]['ingredients']
                 let method = drinkDict[idx]['method']
+                let sim = drinkDict[idx]['similarity'];
                 let tempDiv = document.createElement("div")
-                tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method)
+                tempDiv.innerHTML = answerBoxTemplate(drink_id, drink, ingredients, method, sim)
                 document.getElementById("responses").appendChild(tempDiv)
                 i--
             }
@@ -239,7 +249,7 @@
                 .then((response) => response.json())
                 .then((data) => {
                     for (let i = 0; i < drink_id_list.length; i++) {
-                        document.getElementById(drink_id_list[i]).innerHTML = `<p>${data['popularity'][i]}</p>`
+                        document.getElementById(drink_id_list[i]).innerHTML = `${data['popularity'][i]}`
                     }
                 })
         }
@@ -251,7 +261,7 @@
                 fetch("/add_dislike?" + new URLSearchParams({ drink_id: drink_id }).toString(), { method: "POST" })
                     .then((response) => response.json())
                     .then((data) => {
-                        document.getElementById(drink_id).innerHTML = `<p>${data['popularity']}</p>`
+                        document.getElementById(drink_id).innerHTML = `${data['popularity']}`
                         like_button.classList.remove('clicked');
                         document.getElementById(drink_id + "_dislike").disabled = false;
 
@@ -261,7 +271,7 @@
                 fetch("/add_like?" + new URLSearchParams({ drink_id: drink_id }).toString(), { method: "POST" })
                     .then((response) => response.json())
                     .then((data) => {
-                        document.getElementById(drink_id).innerHTML = `<p>${data['popularity']}</p>`
+                        document.getElementById(drink_id).innerHTML = `${data['popularity']}`
                         like_button.classList.add('clicked');
                         document.getElementById(drink_id + "_dislike").disabled = true;
                     })
@@ -276,7 +286,7 @@
                 fetch("/add_like?" + new URLSearchParams({ drink_id: drink_id }).toString(), { method: "POST" })
                     .then((response) => response.json())
                     .then((data) => {
-                        document.getElementById(drink_id).innerHTML = `<p>${data['popularity']}</p>`
+                        document.getElementById(drink_id).innerHTML = `${data['popularity']}`
                         dislike_button.classList.remove('clicked');
                         document.getElementById(drink_id + "_like").disabled = false;
                     })
@@ -285,7 +295,7 @@
                 fetch("/add_dislike?" + new URLSearchParams({ drink_id: drink_id }).toString(), { method: "POST" })
                     .then((response) => response.json())
                     .then((data) => {
-                        document.getElementById(drink_id).innerHTML = `<p>${data['popularity']}</p>`;
+                        document.getElementById(drink_id).innerHTML = `${data['popularity']}`;
                         document.getElementById(drink_id + "_like").disabled = true;
                         dislike_button.classList.add('clicked');
                     })
@@ -297,6 +307,27 @@
             document.getElementById("responses").innerHTML = ''
             if (value == "popularity") renderResultsByPop()
             else renderResultsByRel()
+        }
+
+        function showReviews(id) {
+
+            mockComments = ["This drink sucks.", "This drink is amazing! 10/10.", "Instructions are confusing"];
+            document.getElementById(`${id}-show-review`).style.visibility = "hidden";
+            document.getElementById(`${id}_reviews`).innerHTML = "<h2>User Reviews</h2>"
+            mockComments.forEach((comment) => {
+                tempDiv = document.createElement("p");
+                tempDiv.innerHTML = `${comment}`;
+                document.getElementById(`${id}_reviews`).appendChild(tempDiv);
+            })
+            hideButton = document.createElement("div");
+            hideButton.innerHTML = `<button class="show-reviews" onClick="hideReviews('${id}')">Hide Reviews</button>`
+            document.getElementById(`${id}_reviews`).appendChild(hideButton);
+
+        }
+
+        function hideReviews(id) {
+            document.getElementById(`${id}_reviews`).innerHTML = '';
+            document.getElementById(`${id}-show-review`).style.visibility = "visible";
         }
 
     </script>

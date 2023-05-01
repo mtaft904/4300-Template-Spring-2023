@@ -161,6 +161,7 @@ h2 {
 }
 
 .pop-button {
+    height: min-content;
     padding: 15px;
     cursor: pointer;
     border: 1px solid black;
@@ -184,8 +185,7 @@ h2 {
     font-size: 20px;
     font-family: sans-serif;
     padding: none;
-    margin-top: 0;
-    margin: 0 10px 0 10px;
+    margin: 12px 10px 0 10px;
 }
 
 .result {
@@ -194,4 +194,58 @@ h2 {
 
 .clicked {
     border: 2px solid darkorange;
+}
+
+.reviews-box {
+    padding: 30px;
+    line-height: 30px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.show-reviews {
+    padding: 15px;
+    background-color: inherit;
+    border: 2px solid black;
+    border-radius: 50px;
+}
+
+.show-reviews:hover {
+    border: 2px solid darkorange;
+    cursor: pointer;
+
+}
+
+
+#search-again {
+    padding: 20px;
+    position: absolute;
+    left: 0px;
+    margin: 10px;
+    border-radius: 50px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#search-again:hover {
+    font-weight: bolder;
+    text-decoration: underline;
+}
+
+#filter {
+    font-family: sans-serif;
+}
+
+.filter-button {
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 10px;
+    font-weight: bold;
+    background-color: inherit;
+}
+
+.filter-button:hover {
+    border-color: orange;
+    cursor: pointer;
 }
