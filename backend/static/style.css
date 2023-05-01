@@ -216,17 +216,21 @@ h2 {
 }
 
 
-.search-again {
-    padding: 15px;
-    border: 2px solid black;
+#search-again {
+    padding: 20px;
+    position: absolute;
+    left: 0px;
+    margin: 10px;
     border-radius: 50px;
-    width: 250px;
     text-align: center;
     text-decoration: none;
+    color: black;
+    font-family: 'Montserrat', sans-serif;
 }
 
-.search-again:hover {
-    background-color: darkorange;
+#search-again:hover {
+    font-weight: bolder;
+    text-decoration: underline;
 }
 
 #filter {
