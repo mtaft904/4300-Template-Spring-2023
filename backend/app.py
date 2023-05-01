@@ -179,6 +179,22 @@ def normalize_ingredients_compressed(ingredients_compressed):
     return sknorm(ingredients_compressed.transpose(), axis=1)
 
 
+def query_expand(ingredients, ingredient_index, d_i_matrix):
+    # given list of liked ingredients, returns top 3 most similar matches by SVD
+    # decompistion as (ingredient_id, ingredient_name)
+    _, _, ingredients_compressed = svd_decomp(d_i_matrix)
+    ingredients_compressed_norm = normalize_ingredients_compressed(
+        ingredients_compressed)
+    matches = []
+    for i in ingredients:
+        matches.extend(closest_ingredients(
+            ingredient_index[i], ingredients_compressed_norm))
+        
+    matches = sorted(matches, key=lambda t: t[1], reverse=True)
+    ingredient_list = list(ingredient_index)
+    return [(i, ingredient_list[i]) for i, _ in matches[:3]]
+
+
 @app.route("/dislikes", methods=["POST"])
 def add_dislike():
     global likes
@@ -197,16 +213,6 @@ def add_dislike():
     keys = ["drink_id", "drink", "ingredients", "method", "similarity"]
     result = json.dumps([dict(zip(keys, lookup_drink_by_id(id)+[sim]))
                         for id, sim in top_10])
-
-    _, _, ingredients_compressed = svd_decomp(d_i_matrix)
-    ingredients_compressed_norm = normalize_ingredients_compressed(
-        ingredients_compressed)
-    closest = closest_ingredients(ingredient_index[likes[0] if likes else normalize_ingredient(
-        'champagne')], ingredients_compressed_norm)
-    print(closest)
-    ingredient_list = [i for i in ingredient_index]
-    for i, s in closest:
-        print(ingredient_list[i], s)
 
     return result
 
