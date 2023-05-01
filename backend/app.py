@@ -147,7 +147,7 @@ def cosine_sim_ranking(query_vec, d_i_matrix):
     return list(zip(rankings, sims[rankings]))
 
 
-def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.1, gamma=0.1, trim=True):
+def rocchio_update(likes_vec, dislikes_vec, d_i_matrix, alpha=1.0, beta=0.1, gamma=0.5, trim=False):
     like_ids = np.where(
         np.any(np.logical_and(likes_vec, d_i_matrix), axis=1))[0]
     dislike_ids = np.where(
