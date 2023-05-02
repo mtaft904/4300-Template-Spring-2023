@@ -29,7 +29,8 @@ CREATE TABLE comments(
     author nvarchar(64),
     content nvarchar(1024)
 );
-ALTER TABLE comments CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+ALTER DATABASE drinkdb CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE comments CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 INSERT INTO drinks VALUE(0, "Bellini", "100 ml Prosecco,50 ml White Peach Puree", "Pour peach puree into the mixing glass with ice, add the Prosecco wine. Stir gently and pour in a chilled flute glass.  Note: PUCCINI - Fresh Mandarin Orange Juice; ROSSINI - Fresh Strawberry Puree; TINTORETTO - Fresh Pomegranate Juice.");
 INSERT INTO drinks VALUE(1, "Black Russian", "50 ml Vodka,20 ml Coffee Liqueur", "Pour the ingredients into the old fashioned glass filled with ice cubes. Stir gently.  Note: WHITE RUSSIAN - Float fresh cream on the top and stir in slowly.");
@@ -604,7 +605,7 @@ INSERT INTO comments VALUE(35, "Mark Norman", "The best. Ginger beer first, then
 INSERT INTO comments VALUE(50, "Michał Kowalczyk", "Absolutely delicious drink that tastes like a summer itself.");
 INSERT INTO comments VALUE(50, "Alex Tuns", "Best drink ever");
 INSERT INTO comments VALUE(50, "Daniel Saavedra", "alternatively to Prosecco (if you don't like it bubbly) you can also take regular white house wine");
-INSERT INTO comments VALUE(50, "Martina Ivanova", "Great! I had an awesome Aperol Spritz next to Duomo, Milan 😍😋");
+INSERT INTO comments VALUE(50, "Martina Ivanova", "Great! I had an awesome Aperol Spritz next to Duomo, Milan");
 INSERT INTO comments VALUE(56, "Cecile Jones", "One of the first drink I had when I visited Nassau Bahamas back in the 70-80's. It's a delicious fruity drink with a knockout punch because of delicious galliano..I met the most wonderful guy on that day ' you gonna coast on that one eh'... from that day we kept up a relationship for about 5 years...I lived in queens ny and he worked for an airline...it was wonderful..because of him I've gotten quite familiar with a few liqueurs...I will never forget the Bahamas!!!");
 INSERT INTO comments VALUE(66, "Martin Tužinčin", "Floridita in Havana have best Daiquiri");
 INSERT INTO comments VALUE(66, "Allen Kim", "I love it! Especially with strawberries.");

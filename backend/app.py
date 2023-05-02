@@ -68,7 +68,9 @@ def normalize_ingredient(ingredient):
 def ingredient_name_index():
     query_sql = f"""SELECT DISTINCT ingredient FROM drinkdb.ingredients"""
     data = mysql_engine.query_selector(query_sql)
-    return {normalize_ingredient(ingredient[0]): i for i, ingredient in enumerate(data)}
+    ingredients = {normalize_ingredient(i[0]) for i in data}
+    res = {ingredient: i for i, ingredient in enumerate(ingredients)}
+    return res
 
 
 def drink_ingredient_matrix(ingredient_index):
