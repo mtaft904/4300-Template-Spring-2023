@@ -8,13 +8,13 @@ CREATE TABLE drinks(
     drink varchar(64),
     ingredients varchar(1024),
     method varchar(1024)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 DROP TABLE IF EXISTS ingredients;
 CREATE TABLE ingredients(
     drink_id int,
     ingredient varchar(64)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 DROP TABLE IF EXISTS ratings;
 CREATE TABLE ratings(
@@ -26,11 +26,9 @@ CREATE TABLE ratings(
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments(
     drink_id int,
-    author nvarchar(64),
-    content nvarchar(1024)
+    author varchar(64),
+    content varchar(1024)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-ALTER DATABASE drinkdb CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE comments CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 INSERT INTO drinks VALUE(0, "Bellini", "100 ml Prosecco,50 ml White Peach Puree", "Pour peach puree into the mixing glass with ice, add the Prosecco wine. Stir gently and pour in a chilled flute glass.  Note: PUCCINI - Fresh Mandarin Orange Juice; ROSSINI - Fresh Strawberry Puree; TINTORETTO - Fresh Pomegranate Juice.");
 INSERT INTO drinks VALUE(1, "Black Russian", "50 ml Vodka,20 ml Coffee Liqueur", "Pour the ingredients into the old fashioned glass filled with ice cubes. Stir gently.  Note: WHITE RUSSIAN - Float fresh cream on the top and stir in slowly.");
