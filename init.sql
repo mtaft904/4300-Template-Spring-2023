@@ -617,3 +617,5 @@ INSERT INTO comments VALUE(77, "Cooking With Liam", "Very smooth with hints of s
 INSERT INTO comments VALUE(77, "Alex Spe", "god bless donald draper");
 INSERT INTO comments VALUE(77, "Emily Christine", "A little sweet for me, but a classic.");
 INSERT INTO comments VALUE(84, "Jennifer Kreimer", "Loved");
+
+ALTER DATABASE drinkdb CHARSET=utf8 COLLATE=utf8_general_ci;
