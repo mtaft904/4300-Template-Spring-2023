@@ -28,7 +28,7 @@ CREATE TABLE comments(
     drink_id int,
     author nvarchar(64),
     content nvarchar(1024)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 ALTER DATABASE drinkdb CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER TABLE comments CHARACTER SET utf8 COLLATE utf8_general_ci;
 
